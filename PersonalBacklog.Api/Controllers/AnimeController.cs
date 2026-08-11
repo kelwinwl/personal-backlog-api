@@ -62,7 +62,7 @@ public class AnimeController : ControllerBase
         }
         catch (DbUpdateConcurrencyException)
         {
-            if (!_context.Animes.Any(e => e.Id == id))
+            if (!_context.Animes.Any(a => a.Id == id))
                 return NotFound();
         }
 
