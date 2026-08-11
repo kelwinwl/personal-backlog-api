@@ -1,6 +1,38 @@
-@PersonalBacklog.Api_HostAddress = http://localhost:5111
+@host = http://localhost:5111
 
-GET {{PersonalBacklog.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+POST {{host}}/api/anime
+Content-Type: application/json
+
+{
+    "title": "Solo Leveling",
+    "description": "Sung Jin Woo.",
+    "totalEpisodes": 13,
+    "currentEpisodes": 10,
+    "status": "Watching"
+}
 
 ###
+
+GET {{host}}/api/anime
+
+###
+
+GET {{host}}/api/anime/7
+
+###
+
+PUT {{host}}/api/anime/7
+Content-Type: application/json
+
+{
+    "id": 7,
+    "title": "Solo Leveling",
+    "description": "They say whatever doesn’t kill you makes you stronger, but that’s not the case for the world’s weakest hunter Sung Jinwoo. After being brutally slaughtered by monsters in a high-ranking dungeon, Jinwoo came back with the System, a program only he could see, that’s leveling him up in every way. Now, he’s inspired to discover the secrets behind his powers and the dungeon that spawned them.",
+    "totalEpisodes": 13,
+    "currentEpisodes": 13,
+    "status": "Completed"
+}
+
+###
+
+DELETE {{host}}/api/anime/5
