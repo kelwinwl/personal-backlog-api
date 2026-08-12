@@ -24,7 +24,8 @@ public class BacklogDbContext : DbContext
             {
                 entry.Entity.DateUpdated =  DateTime.UtcNow;
                 
-                entry.Property(anime => anime.DateAdded).IsModified = false;
+                // Prevents the original creation date from being overwritten to 01-01-0001 during update request
+                entry.Property(a => a.DateAdded).IsModified = false;
             }
                 
         }
