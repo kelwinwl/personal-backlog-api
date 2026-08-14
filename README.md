@@ -9,7 +9,8 @@
 * **Linguagem:** C# (.NET 10)
 * **Framework Web:** ASP.NET Core Web API
 * **ORM:** Entity Framework Core
-* **Banco de Dados:** SQL Server
+* **Banco de Dados:** PostgreSQL
+* **Conteinerização:** Docker, Docker Compose
 * **Documentação & Testes:** OpenAPI (Nativo) + Scalar UI
 
 ---
@@ -17,28 +18,39 @@
 ## Como Executar o Projeto Localmente
 
 ### Pré-requisitos
-* [SDK do .NET 10](https://dotnet.microsoft.com/) instalado em sua máquina.
-* Instância do SQL Server rodando localmente ou via Docker (verifique a **Connection String** no `appsettings.json`).
+Antes de tudo, verifique se possui as ferramentas necessárias instaladas:
+- [.NET 10 SDK](https://dotnet.microsoft.com/en-us/)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) 
+
 
 ## Passos para rodar:
-
-### Atenção, antes executar os comandos, lembre-se de ajustar a chave `ConnectionStrings` no arquivo `appsettings.Development.json` para a sua instância local do SQL Server
-```json
-"ConnectionStrings": {
-  "DefaultConnection": "Server=YOUR_LOCAL_INSTANCE;Database=PersonalBacklogDb;Trusted_Connection=True;TrustServerCertificate=True;"
-}
-```
-
 
 #### 1. Clone este repositório:
    ```bash
    git clone https://github.com/kelwinwl/personal-backlog-api.git
+   cd personal-backlog-api
    ```
-#### 2. Acesse a pasta do projeto:
-```bash
-cd personal-backlog-api/PersonalBacklog.Api
+#### 2. Configure a `.env`
+Crie um arquivo chamado `.env` e use esse padrão:
 ```
-### 3. Crie o banco de dados e as tabelas: 
+POSTGRES_USER=api_backlog
+POSTGRES_PASSWORD=          
+POSTGRES_DB=PersonalBacklogDB
+```
+#### 3. Crie a Database com o Docker
+```bash
+docker-compose up -d          # É necessário instalar o Docker Desktop ou alternativas open-source (veja pré-requisitos) 
+```
+
+#### 4. Configure o user-secret
+É necessário configurar a ConnectionString para conseguir se conectar ao banco de dados, para isso, coloque o comando:
+```bash
+cd PersonalBacklog.Api
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost; Port=5432;Database=PersonalBacklogDB;Username=api_backlog;Password=SUASENHA"
+```
+- No campo Password, você colocará no lugar de SUASENHA, a senha inserida no arquivo `.env`, onde tem `POSTGRES_PASSWORD=` 
+
+### 4. Crie o banco de dados e as tabelas: 
 ```bash
 dotnet restore     # Normalmente não é necessário, será somente para evitar erros.
 dotnet ef database update

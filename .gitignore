@@ -430,3 +430,6 @@ FodyWeavers.xsd
 
 # Jetbrains Rider preferences
 .idea/
+
+# Docker compose data
+data-db/
