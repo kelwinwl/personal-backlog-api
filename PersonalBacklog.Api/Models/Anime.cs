@@ -16,17 +16,11 @@ public class Anime
     public int TotalEpisodes { get; set; }
     
     public int CurrentEpisodes { get; set; }
-
-    [Required]
-    [MaxLength(30)]
-    [AllowedValues("Plan to Watch", "Watching", "Completed", "Dropped", "Paused", ErrorMessage = "Invalid status provided.")]
-    public string Status { get; set; } = "Plan to Watch";
     
     [MaxLength(400)]
     public string? ImageUrl { get; set; }
     
-    public DateTime? DateStarted { get; set; }
-    public DateTime? DateFinished { get; set; }
-    public DateTime DateAdded { get; set; }
     public DateTime DateUpdated { get; set; }
+    
+    public ICollection<UserAnime> UserAnimes { get; set; } = new List<UserAnime>();
 }

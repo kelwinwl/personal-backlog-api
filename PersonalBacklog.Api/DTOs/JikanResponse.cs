@@ -22,6 +22,9 @@ public class JikanAnimeData
     [JsonPropertyName("episodes")]
     public int? Episodes { get; set; }
     
+    [JsonPropertyName("status")]
+    public string? Status { get; set; }
+    
     [JsonPropertyName("images")]
     public JikanImages? Images { get; set; }
 }

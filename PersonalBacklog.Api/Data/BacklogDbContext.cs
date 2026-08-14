@@ -10,6 +10,30 @@ public class BacklogDbContext : DbContext
     }
     
     public DbSet<Anime> Animes { get; set; }
+    public DbSet<User> Users { get; set; }
+    public DbSet<UserAnime> UserAnimes { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<UserAnime>()
+            .HasKey(ua => new { ua.UserId, ua.AnimeId });
+        
+        modelBuilder.Entity<UserAnime>()
+            .HasOne(ua => ua.User)
+            .WithMany(u => u.UserAnimes)
+            .HasForeignKey(ua => ua.UserId);
+        
+        modelBuilder.Entity<UserAnime>()
+            .HasOne(ua => ua.Anime)
+            .WithMany(a => a.UserAnimes)
+            .HasForeignKey(ua => ua.AnimeId);
+
+        modelBuilder.Entity<Anime>()
+            .HasIndex(a => a.MalId)
+            .IsUnique();
+    }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
@@ -17,18 +41,15 @@ public class BacklogDbContext : DbContext
         {
             if (entry.State == EntityState.Added)
             {
-                entry.Entity.DateAdded = DateTime.UtcNow;
                 entry.Entity.DateUpdated = DateTime.UtcNow;
             }
             else if (entry.State == EntityState.Modified)
             {
                 entry.Entity.DateUpdated =  DateTime.UtcNow;
-                
-                // Prevents the original creation date from being overwritten to 01-01-0001 during update request
-                entry.Property(a => a.DateAdded).IsModified = false;
             }
-                
         }
+        
+        
         return base.SaveChangesAsync(cancellationToken);
     }
 }

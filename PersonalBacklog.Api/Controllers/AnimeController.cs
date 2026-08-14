@@ -78,20 +78,6 @@ public class AnimeController : ControllerBase
         return NoContent();
     }
 
-    [HttpDelete("{id}")]
-    public async Task<ActionResult> AnimeDelete(int id)
-    {
-        var anime = await _context.Animes.FindAsync(id);
-        if (anime == null)
-            return NotFound();
-        
-        
-        _context.Animes.Remove(anime);
-        await _context.SaveChangesAsync();
-        
-        return NoContent();
-    }
-
     [HttpPost("import/{malId}")]
     public async Task<IActionResult> ImportAnimeFromJikan(int malId, [FromServices] JikanApiServices jikanServices)
     {
@@ -100,9 +86,7 @@ public class AnimeController : ControllerBase
             return BadRequest($"Anime with MyAnimeList ID {malId} is already in your backlog");
         
         var jikanData = await jikanServices.GetAnimeByIdAsync(malId);
-        if (jikanData == null)
-            return NotFound($"Could not find anime with ID {malId} on MyAnimeList");
-
+        
         var newAnime = new Anime
         {
             MalId = jikanData.MalId,
@@ -110,8 +94,6 @@ public class AnimeController : ControllerBase
             Description = jikanData.Synopsis,
             TotalEpisodes = jikanData.Episodes ?? 0,
             ImageUrl = jikanData.Images?.Jpg?.LargeImageUrl ?? jikanData.Images?.Jpg?.ImageUrl,
-            Status = "Plan to Watch",
-            DateAdded = DateTime.UtcNow,
             DateUpdated = DateTime.UtcNow
         };
 
