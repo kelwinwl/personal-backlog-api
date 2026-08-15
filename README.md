@@ -50,7 +50,7 @@ dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost; P
 ```
 - No campo Password, você colocará no lugar de SUASENHA, a senha inserida no arquivo `.env`, onde tem `POSTGRES_PASSWORD=` 
 
-### 4. Crie o banco de dados e as tabelas: 
+### 4. Crie as tabelas: 
 ```bash
 dotnet restore     # Normalmente não é necessário, será somente para evitar erros.
 dotnet ef database update
