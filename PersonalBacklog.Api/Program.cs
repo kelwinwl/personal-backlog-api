@@ -1,9 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using PersonalBacklog.Api.Data;
 using PersonalBacklog.Api.Services;
+using PersonalBacklog.Api.Services.Interfaces;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddScoped<IAnimeService, AnimeService>();
 
 builder.Services.AddDbContext<BacklogDbContext>(options => 
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -13,7 +16,8 @@ builder.Services.AddDbContext<BacklogDbContext>(options =>
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 
-builder.Services.AddHttpClient<JikanApiServices>();
+builder.Services.AddHttpClient<IExternalAnimeProvider, JikanApiService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

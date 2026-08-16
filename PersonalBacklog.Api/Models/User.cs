@@ -7,10 +7,14 @@ public class User
     public int Id { get; set; }
     
     [Length(3, 32, ErrorMessage = "Username must have between 3 and 32 characters.")]
+    [MaxLength(32)]
     public required string Username { get; set; }
     
+    [MaxLength(255)]
     public required string PasswordHash { get; set; }
     
+    [EmailAddress]
+    [MaxLength(255)]
     public required string Email { get; set; }
 
     public DateOnly DateUserRegistered { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);

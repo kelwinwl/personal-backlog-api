@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using PersonalBacklog.Api.Data;
-using PersonalBacklog.Api.Models;
-using PersonalBacklog.Api.Services;
+using PersonalBacklog.Api.Services.Interfaces;
+using PersonalBacklog.Api.DTOs;
 
 namespace PersonalBacklog.Api.Controllers;
 
@@ -10,96 +8,69 @@ namespace PersonalBacklog.Api.Controllers;
 [Route("api/[controller]")]
 public class AnimeController : ControllerBase
 {
-    private readonly BacklogDbContext _context;
+    private readonly IAnimeService _animeService;
 
-    public AnimeController(BacklogDbContext context)
+    public AnimeController(IAnimeService animeService)
     {
-        _context = context;
+        _animeService = animeService;
     }
 
     [HttpPost]
-    public async Task<IActionResult> AnimeCreate([FromBody]Anime anime)
+    public async Task<IActionResult> AnimeCreate([FromBody]CreateAnimeDto dto)
     {
-        _context.Animes.Add(anime);
-
-        await _context.SaveChangesAsync();
-        
-        return Created($"/api/anime/{anime.Id}", anime);
+     var anime = await _animeService.CreateAnimeAsync(dto);
+     
+        return CreatedAtAction(nameof(GetAnimeById), new { id = anime.Id }, anime);
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAllAnimes()
     {
-        var animes = await _context.Animes.ToListAsync();
+        var animes = await _animeService.GetAllAsync();
         
         return Ok(animes);
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetAnimeByID(int id)
+    public async Task<IActionResult> GetAnimeById(int id)
     {
-        var anime = await _context.Animes.FindAsync(id);
+        var anime = await _animeService.GetByIdAsync(id);
         if (anime == null)
             return NotFound();
-        
         
         return Ok(anime);
     }
 
     [HttpGet("search")]
-    public async Task<IActionResult> GetAnimeByQuery([FromQuery] string name)
+    public async Task<IActionResult> GetAnimeByQuery([FromQuery] string? name)
     {
-        var animeFiltered = await _context.Animes
-            .Where(a => a.Title.Contains(name))
-            .ToListAsync();
+        if (string.IsNullOrWhiteSpace(name))
+            return BadRequest("Search query cannot be empty. Please provide a name parameter.");
+        
+        var animeSearch = await _animeService.SearchTitleAsync(name);
                          
-        return Ok(animeFiltered);
+        return Ok(animeSearch);
     }
     
     [HttpPut("{id}")]
-    public async Task<IActionResult> AnimeUpdate(int id, [FromBody] Anime anime)
+    public async Task<IActionResult> AnimeUpdate(int id, [FromBody] UpdateAnimeDto anime)
     {
-        if (id != anime.Id)
-            return BadRequest("The ID in the URL does not match the ID in the request body.");
-        
-        
-        _context.Entry(anime).State = EntityState.Modified;
+        var success = await _animeService.UpdateAnimeAsync(id, anime);
 
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!_context.Animes.Any(a => a.Id == id))
-                return NotFound();
-        }
-
+        if (!success)
+            return NotFound($"Anime with ID {id} does not exist");
+        
         return NoContent();
     }
 
     [HttpPost("import/{malId}")]
-    public async Task<IActionResult> ImportAnimeFromJikan(int malId, [FromServices] JikanApiServices jikanServices)
+    public async Task<IActionResult> ImportAnimeFromJikan(int malId)
     {
-        var existingName = await _context.Animes.FirstOrDefaultAsync(a => a.MalId == malId);
-        if (existingName != null)
-            return BadRequest($"Anime with MyAnimeList ID {malId} is already in your backlog");
-        
-        var jikanData = await jikanServices.GetAnimeByIdAsync(malId);
-        
-        var newAnime = new Anime
-        {
-            MalId = jikanData.MalId,
-            Title = jikanData.Title,
-            Description = jikanData.Synopsis,
-            TotalEpisodes = jikanData.Episodes ?? 0,
-            ImageUrl = jikanData.Images?.Jpg?.LargeImageUrl ?? jikanData.Images?.Jpg?.ImageUrl,
-            DateUpdated = DateTime.UtcNow
-        };
+        var animeImport = await _animeService.ImportFromExternalAsync(malId);
 
-        _context.Animes.Add(newAnime);
-        await _context.SaveChangesAsync();
+        if (animeImport == null)
+            return NotFound($"Anime with MyAnimeList ID {malId} was not found.");
         
-        return CreatedAtAction(nameof(GetAnimeByID), new { id = newAnime.Id }, newAnime);
+        return Ok(animeImport);
     }
 }

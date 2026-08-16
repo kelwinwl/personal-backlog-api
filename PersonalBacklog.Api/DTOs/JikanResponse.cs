@@ -2,44 +2,24 @@ using System.Text.Json.Serialization;
 
 namespace PersonalBacklog.Api.DTOs;
 
-public class JikanResponse
-{
-    [JsonPropertyName("data")] 
-    public required JikanAnimeData Data { get; set; }
-}
+public record JikanResponse(
+    [property: JsonPropertyName("data")] JikanAnimeData Data
+);
 
-public class JikanAnimeData
-{
-    [JsonPropertyName("mal_id")]
-    public int MalId { get; set; }
+public record JikanAnimeData(
+    [property: JsonPropertyName("mal_id")] int MalId,
+    [property: JsonPropertyName("title")] string Title,
+    [property: JsonPropertyName("synopsis")] string? Synopsis,
+    [property: JsonPropertyName("episodes")] int? Episodes,
+    [property: JsonPropertyName("status")] string? Status,
+    [property: JsonPropertyName("images")] JikanImages? Images
+);
 
-    [JsonPropertyName("title")] 
-    public required string Title { get; set; }
-    
-    [JsonPropertyName("synopsis")]
-    public string? Synopsis { get; set; }
-    
-    [JsonPropertyName("episodes")]
-    public int? Episodes { get; set; }
-    
-    [JsonPropertyName("status")]
-    public string? Status { get; set; }
-    
-    [JsonPropertyName("images")]
-    public JikanImages? Images { get; set; }
-}
+public record JikanImages(
+    [property: JsonPropertyName("jpg")] JikanImageFormats? Jpg
+);
 
-public class JikanImages
-{
-    [JsonPropertyName("jpg")]
-    public JikanImageFormats? Jpg { get; set; }
-}
-
-public class JikanImageFormats
-{
-    [JsonPropertyName("image_url")]
-    public string? ImageUrl { get; set; }
-    
-    [JsonPropertyName("large_image_url")]
-    public string? LargeImageUrl { get; set; }
-}
+public record JikanImageFormats(
+    [property: JsonPropertyName("image_url")] string? ImageUrl,
+    [property: JsonPropertyName("large_image_url")] string? LargeImageUrl
+    );
