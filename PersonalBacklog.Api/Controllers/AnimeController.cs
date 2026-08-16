@@ -6,19 +6,12 @@ namespace PersonalBacklog.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AnimeController : ControllerBase
+public class AnimeController(IAnimeService animeService) : ControllerBase
 {
-    private readonly IAnimeService _animeService;
-
-    public AnimeController(IAnimeService animeService)
-    {
-        _animeService = animeService;
-    }
-
     [HttpPost]
     public async Task<IActionResult> AnimeCreate([FromBody]CreateAnimeDto dto)
     {
-     var anime = await _animeService.CreateAnimeAsync(dto);
+     var anime = await animeService.CreateAnimeAsync(dto);
      
         return CreatedAtAction(nameof(GetAnimeById), new { id = anime.Id }, anime);
     }
@@ -26,7 +19,7 @@ public class AnimeController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllAnimes()
     {
-        var animes = await _animeService.GetAllAsync();
+        var animes = await animeService.GetAllAsync();
         
         return Ok(animes);
     }
@@ -34,7 +27,7 @@ public class AnimeController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetAnimeById(int id)
     {
-        var anime = await _animeService.GetByIdAsync(id);
+        var anime = await animeService.GetByIdAsync(id);
         if (anime == null)
             return NotFound();
         
@@ -47,7 +40,7 @@ public class AnimeController : ControllerBase
         if (string.IsNullOrWhiteSpace(name))
             return BadRequest("Search query cannot be empty. Please provide a name parameter.");
         
-        var animeSearch = await _animeService.SearchTitleAsync(name);
+        var animeSearch = await animeService.SearchTitleAsync(name);
                          
         return Ok(animeSearch);
     }
@@ -55,7 +48,7 @@ public class AnimeController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> AnimeUpdate(int id, [FromBody] UpdateAnimeDto anime)
     {
-        var success = await _animeService.UpdateAnimeAsync(id, anime);
+        var success = await animeService.UpdateAnimeAsync(id, anime);
 
         if (!success)
             return NotFound($"Anime with ID {id} does not exist");
@@ -66,7 +59,7 @@ public class AnimeController : ControllerBase
     [HttpPost("import/{malId}")]
     public async Task<IActionResult> ImportAnimeFromJikan(int malId)
     {
-        var animeImport = await _animeService.ImportFromExternalAsync(malId);
+        var animeImport = await animeService.ImportFromExternalAsync(malId);
 
         if (animeImport == null)
             return NotFound($"Anime with MyAnimeList ID {malId} was not found.");
