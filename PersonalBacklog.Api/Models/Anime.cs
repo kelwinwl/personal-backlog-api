@@ -11,12 +11,9 @@ public class Anime
     [MaxLength(100, ErrorMessage = "The title cannot exceed 100 characters.")]
     public string Title { get; set; } = string.Empty;
     
-    [MaxLength(500)]
     public string? Description { get; set; }
     
     public int TotalEpisodes { get; set; }
-    
-    public int CurrentEpisodes { get; set; }
     
     [MaxLength(400)]
     public string? ImageUrl { get; set; }

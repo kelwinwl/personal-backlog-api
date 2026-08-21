@@ -24,7 +24,7 @@ public class AnimeController(IAnimeService animeService) : ControllerBase
         return Ok(animes);
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     public async Task<IActionResult> GetAnimeById(int id)
     {
         var anime = await animeService.GetByIdAsync(id);
@@ -45,7 +45,7 @@ public class AnimeController(IAnimeService animeService) : ControllerBase
         return Ok(animeSearch);
     }
     
-    [HttpPut("{id}")]
+    [HttpPut("{id:int}")]
     public async Task<IActionResult> AnimeUpdate(int id, [FromBody] UpdateAnimeDto anime)
     {
         var success = await animeService.UpdateAnimeAsync(id, anime);
@@ -56,7 +56,7 @@ public class AnimeController(IAnimeService animeService) : ControllerBase
         return NoContent();
     }
 
-    [HttpPost("import/{malId}")]
+    [HttpPost("import/{malId:int}")]
     public async Task<IActionResult> ImportAnimeFromJikan(int malId)
     {
         var animeImport = await animeService.ImportFromExternalAsync(malId);
